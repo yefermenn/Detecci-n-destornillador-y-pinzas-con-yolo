@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['Destornillador', 'Pinzas']
+
+roboflow:
+  workspace: jeferssons-workspace
+  project: my-first-project-ejpzj
+  version: dataset
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/jeferssons-workspace/my-first-project-ejpzj/dataset/dataset
