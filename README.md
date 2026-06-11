@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Este proyecto implementa un modelo de visión artificial entrenado con YOLOv8n para detectar dos clases de objetos en imágenes en tiempo real: destornilladores y pinzas. El sistema fue desarrollado como laboratorio práctico de visión artificial y demuestra la capacidad de redes neuronales convolucionales para identificar y localizar objetos específicos dentro de escenas complejas.
+Este proyecto implementa un modelo de visión artificial entrenado con YOLOv8n para la detección en tiempo real de herramientas de precisión: destornilladores y pinzas. El sistema fue desarrollado como laboratorio práctico de visión artificial y demuestra la capacidad de las redes neuronales convolucionales para identificar y localizar objetos específicos con alta precisión. El modelo alcanzó métricas de desempeño excepcionales, con una precisión general de 0.987 y recall de 0.964.
 
 ## ¿Qué es YOLO?
 
@@ -25,18 +25,26 @@ El modelo fue entrenado para detectar las siguientes dos clases de objetos:
 
 ## Construcción del Dataset
 
-Para lograr que YOLO detecte exclusivamente los objetos preparados para este laboratorio, se construyó un dataset de 200 fotografías en total: 100 fotografías por cada clase. 
+Para lograr que YOLO detecte exclusivamente los objetos preparados para este laboratorio, se construyó un dataset de 200 fotografías en total: 100 fotografías por cada clase de objeto. 
 
-Las imágenes fueron etiquetadas utilizando la plataforma web **Roboflow**, que facilita:
+Las imágenes fueron anotadas y procesadas utilizando la plataforma web **Roboflow**, que facilita:
 
-- Anotación precisa de objetos en las imágenes
-- Especificación de cuadros delimitadores alrededor de cada objeto
+- Anotación precisa de objetos en las imágenes mediante cuadros delimitadores
+- Especificación de límites exactos alrededor de cada objeto
 - Asignación automática de clases a cada anotación
 - División automática del dataset en conjuntos de entrenamiento, validación y prueba
+
+![Dataset exportado](Evidencias/dataset%20exportado.png)
+
+*Figura 1: Dataset exportado desde Roboflow en formato compatible con YOLOv8n*
 
 ## División del Dataset
 
 El dataset se dividió en tres subconjuntos con los siguientes porcentajes:
+
+![División del dataset](Evidencias/división%20de%20dataset.png)
+
+*Figura 2: Distribución del dataset en conjuntos de entrenamiento, validación y prueba*
 
 ### Entrenamiento: 65%
 
@@ -64,13 +72,21 @@ Este conjunto simula el comportamiento del modelo en un entorno real, permitiend
 
 ## Entrenamiento del Modelo
 
+![Inicio del entrenamiento](Evidencias/entrenamiento%20inicio.png)
+
+*Figura 3: Inicio del proceso de entrenamiento del modelo YOLOv8n*
+
 Con el dataset preparado y dividido en los tres subconjuntos anteriores, se exportó el conjunto completo en formato comprimido (.zip) compatible con YOLOv8n, que es la versión del modelo utilizada para este proyecto.
 
-Se creó un archivo `train.py` independiente para encapsular la lógica de entrenamiento, separando las responsabilidades del proyecto. El dataset incluye un archivo `data.yaml` que contiene metadatos críticos del dataset, incluyendo:
+Se creó un archivo `train.py` independiente para encapsular la lógica de entrenamiento, separando las responsabilidades del proyecto. El dataset incluye un archivo `data.yaml` que contiene metadatos críticos, incluyendo:
 
 - Rutas a los subconjuntos de entrenamiento, validación y prueba
 - Definición de las clases de objetos
 - Información de licencias
+
+![Finalización del entrenamiento](Evidencias/entrenamiento%20fin.png)
+
+*Figura 4: Resultado final del proceso de entrenamiento con métricas de convergencia*
 
 ## Parámetros de Entrenamiento
 
@@ -87,6 +103,10 @@ El modelo YOLOv8n fue entrenado con la siguiente configuración de parámetros:
 ### Epochs: 30
 
 Se seleccionaron 30 épocas como punto de equilibrio entre la convergencia del modelo y la eficiencia computacional. Este número permite que el modelo complete múltiples ciclos sobre el conjunto de entrenamiento, suficientes para que los pesos de la red neuronal se estabilicen en valores óptimos. Con un dataset limitado a 130 imágenes de entrenamiento, 30 épocas proporcionan suficientes iteraciones para que el modelo generalice sin llevar a sobreajuste excesivo.
+
+![Tiempo de entrenamiento](Evidencias/tiempo%20de%20entrenamiento.png)
+
+*Figura 5: Evolución temporal del proceso de entrenamiento a través de las 30 épocas*
 
 ### Image Size (imgsz): 640
 
@@ -110,6 +130,10 @@ La combinación de estos parámetros fue seleccionada considerando las limitacio
 
 Una vez completado el entrenamiento, el modelo fue evaluado mediante el método `val()` implementado en el archivo `test.py`. Este método realiza predicciones sobre el conjunto de validación y calcula métricas cuantitativas que determinan la efectividad del modelo entrenado.
 
+![Resultados de evaluación](Evidencias/test.png)
+
+*Figura 6: Resultados de la evaluación del modelo en el conjunto de prueba*
+
 ## Métricas Obtenidas
 
 Las métricas globales y por clase obtenidas durante la evaluación del modelo son las siguientes:
@@ -123,13 +147,13 @@ Las métricas globales y por clase obtenidas durante la evaluación del modelo s
 
 ### Explicación de las Métricas
 
-**Precision**: Mide la proporción de predicciones positivas que fueron correctas. Un valor de 0.987 significa que de cada 100 objetos que el modelo identifica como destornillador o pinzas, aproximadamente 99 son correctos. Valores cercanos a 1.0 indican muy pocos falsos positivos.
+**Precision**: Mide la proporción de predicciones positivas que fueron correctas. Un valor de 0.987 significa que de cada 100 objetos que el modelo identifica como destornillador o pinzas, aproximadamente 99 son realmente correctos. Valores cercanos a 1.0 indican muy pocos falsos positivos, es decir, pocas detecciones incorrectas.
 
-**Recall**: Mide la proporción de objetos reales que fueron detectados correctamente. Un valor de 0.964 significa que el modelo detecta aproximadamente el 96.4% de los objetos presentes en las imágenes. Esto indica que muy pocos objetos pasan desapercibidos (falsos negativos).
+**Recall**: Mide la proporción de objetos reales que fueron detectados correctamente por el modelo. Un valor de 0.964 significa que el modelo detecta aproximadamente el 96.4% de los objetos realmente presentes en las imágenes. Valores altos indican que muy pocos objetos pasan desapercibidos (falsos negativos).
 
-**mAP50** (Mean Average Precision a IoU 0.5): Calcula la precisión promediada sobre todas las clases cuando la intersección sobre la unión (IoU) entre la predicción y la verdad es mayor a 0.5. Un mAP50 de 0.96 indica que los cuadros delimitadores predichos tienen una superposición significativa con los reales.
+**mAP50** (Mean Average Precision a IoU 0.5): Calcula la precisión promediada sobre todas las clases cuando la Intersección sobre Unión (IoU) entre la predicción y la verdad fundamental es mayor a 0.5. Un mAP50 de 0.96 indica que los cuadros delimitadores predichos tienen una superposición significativa con los reales, demostrando buena precisión en la localización.
 
-**mAP50-95** (Mean Average Precision a IoU 0.5 a 0.95): Calcula la precisión promediada entre umbrales de IoU de 0.5 a 0.95 en incrementos de 0.05. Es una métrica más estricta que requiere que los cuadros delimitadores sean muy precisos. Un mAP50-95 de 0.812 indica buena precisión general, aunque más conservadora que mAP50.
+**mAP50-95** (Mean Average Precision a IoU 0.5-0.95): Calcula la precisión promediada entre múltiples umbrales de IoU desde 0.5 hasta 0.95 en incrementos de 0.05. Es una métrica más estricta que requiere que los cuadros delimitadores sean muy precisos en sus límites exactos. Un mAP50-95 de 0.812 indica buena precisión general, aunque más conservadora comparada con mAP50.
 
 ## Interpretación de Resultados
 
@@ -137,60 +161,70 @@ Los resultados obtenidos indican un **desempeño excelente** del modelo entrenad
 
 ### Análisis General
 
-Con una precision de 0.987 y recall de 0.964, el modelo demuestra capacidad sobresaliente para identificar correctamente los objetos mientras minimiza falsas detecciones. La combinación de ambas métricas indica que el modelo es tanto confiable como exhaustivo en su búsqueda de objetos.
+Con una precisión de 0.987 y recall de 0.964, el modelo demuestra capacidad sobresaliente para identificar correctamente los objetos mientras minimiza falsas detecciones. La combinación equilibrada de ambas métricas indica que el modelo es tanto confiable como exhaustivo en su búsqueda de objetos, manteniendo un balance óptimo entre detectar todos los objetos presentes y evitar falsas alarmas.
 
 ### Análisis por Clase
 
-**Destornillador**: Los resultados son excepcionales. Con precision de 0.993, recall perfecto de 1.0 y mAP50 de 0.995, el modelo detecta prácticamente la totalidad de los destornilladores sin falsos positivos. El único valor relativamente menor es mAP50-95 de 0.786, sugiriendo que aunque los destornilladores se detectan correctamente, los cuadros delimitadores pueden no ser perfectamente precisos en sus límites exactos.
+**Destornillador**: Los resultados son excepcionales. Con precisión de 0.993, recall perfecto de 1.0 y mAP50 de 0.995, el modelo detecta prácticamente la totalidad de los destornilladores sin producir falsos positivos. El modelo identifica correctamente el 100% de los destornilladores presentes en las imágenes. El único valor relativamente menor es mAP50-95 de 0.786, lo que sugiere que aunque los destornilladores se detectan correctamente en términos de clasificación, los cuadros delimitadores pueden no estar posicionados con exactitud milimétrica en sus límites precisos.
 
-**Pinzas**: Los resultados son muy buenos. Con precision de 0.982, recall de 0.929 y mAP50 de 0.925, el modelo detecta la mayoría de las pinzas con alta confiabilidad. El mAP50-95 de 0.837 es superior al de destornillador, indicando que los cuadros delimitadores de pinzas son ligeramente más precisos en sus límites.
+**Pinzas**: Los resultados son muy buenos y particularmente notables. Con precisión de 0.982, recall de 0.929 y mAP50 de 0.925, el modelo detecta la mayoría de las pinzas con confiabilidad muy alta. El mAP50-95 de 0.837 es superior al de destornillador, indicando que los cuadros delimitadores de pinzas son ligeramente más precisos en sus límites exactos en relación a la verdad fundamental.
 
 ### Justificación del Rendimiento
 
-Estos resultados excelentes se justifican por:
+Estos resultados excelentes se justifican por múltiples factores técnicos y metodológicos:
 
-1. **Dataset bien preparado**: Las 200 imágenes fueron cuidadosamente capturadas y anotadas en Roboflow, proporcionando datos de alta calidad para el entrenamiento.
+1. **Dataset bien preparado**: Las 200 imágenes fueron cuidadosamente capturadas en condiciones controladas y posteriormente anotadas en Roboflow con máxima precisión, proporcionando datos de alta calidad que facilitaron el aprendizaje efectivo del modelo.
 
-2. **División equilibrada**: La proporción 65-20-15 entre entrenamiento, validación y prueba permite que el modelo aprenda adecuadamente sin sobreajuste excesivo.
+2. **División equilibrada**: La proporción 65-20-15 entre entrenamiento, validación y prueba permitió que el modelo aprendiera adecuadamente sin caer en sobreajuste excesivo, garantizando buena generalización a datos no vistos.
 
-3. **Objetos relativamente simples**: Los destornilladores y pinzas tienen características visuales distintivas y consistentes, facilitando su detección por la red neuronal.
+3. **Objetos bien definidos**: Los destornilladores y pinzas poseen características visuales distintivas, consistentes y altamente diferenciables entre sí, facilitando su segmentación y clasificación por la red neuronal convolucional.
 
-4. **Arquitectura apropiada**: YOLOv8n, aunque es una versión "nano" del modelo, es suficientemente poderosa para detectar objetos relativamente grandes y bien definidos.
+4. **Arquitectura apropiada**: YOLOv8n, aunque es una versión "nano" del modelo YOLO, es suficientemente poderosa para detectar objetos de tamaño mediano-grande que poseen características visuales bien definidas.
 
-5. **Parámetros adecuados**: La configuración de 30 épocas, imgsz de 640 y batch size de 2 permitió la convergencia efectiva del modelo sin sobreajuste.
+5. **Parámetros adecuados**: La configuración de 30 épocas, imgsz de 640 y batch size de 2 permitió la convergencia efectiva del modelo sin sobreajuste, encontrando puntos óptimos en la función de pérdida.
 
-**Conclusión sobre los resultados**: El modelo está completamente listo para implementación en producción. Los valores de mAP50 superiores a 0.92 para ambas clases, combinados con recall superior a 0.92, indican que el modelo puede implementarse con confianza en aplicaciones reales de detección de objetos en tiempo real.
+**Conclusión sobre los resultados**: El modelo está completamente listo para implementación en producción. Los valores de mAP50 superiores a 0.92 para ambas clases, combinados con recall superior a 0.92, indican que el modelo puede implementarse con confianza en aplicaciones reales de detección de objetos en tiempo real, garantizando tanto la confiabilidad como la exhaustividad esperadas.
 
 ## Implementación
 
 Se desarrolló un archivo `yolo.py` que implementa la detección de objetos en tiempo real utilizando el modelo entrenado. Este programa realiza las siguientes funciones:
 
-1. **Captura en Tiempo Real**: Abre la cámara integrada del dispositivo para capturar video en vivo.
+1. **Captura en Tiempo Real**: Abre la cámara integrada del dispositivo para capturar video en vivo, procesando cada fotograma de manera continua.
 
-2. **Inferencia del Modelo**: Utiliza el modelo YOLOv8n entrenado para realizar predicciones sobre cada fotograma capturado, identificando la presencia de destornilladores y pinzas en la escena.
+2. **Inferencia del Modelo**: Utiliza el modelo YOLOv8n entrenado para realizar predicciones sobre cada fotograma capturado, identificando la presencia de destornilladores y pinzas en la escena con sus respectivas confianzas.
 
-3. **Visualización de Resultados**: Dibuja cuadros delimitadores (bounding boxes) alrededor de cada objeto detectado, indicando su clase y el nivel de confianza de la predicción.
+3. **Visualización de Resultados**: Dibuja cuadros delimitadores (bounding boxes) alrededor de cada objeto detectado, indicando su clase, coordenadas y el nivel de confianza de la predicción en porcentaje.
 
-4. **Procesamiento en Vivo**: Continúa procesando fotogramas sucesivos, permitiendo seguimiento de objetos conforme se mueven en la escena.
+4. **Procesamiento en Vivo**: Continúa procesando fotogramas sucesivos a tiempo real, permitiendo seguimiento de objetos conforme se mueven en la escena.
 
-El resultado es una aplicación interactiva que permite visualizar en tiempo real cómo el modelo identifica y localiza destornilladores y pinzas en la cámara, demostrando la efectividad del modelo entrenado en condiciones reales.
+### Resultados en Tiempo Real
+
+![Detección de destornillador](Evidencias/ejecución%20modelo%20destornillador.png)
+
+*Figura 7: Detección de destornillador en tiempo real con bounding box y confianza*
+
+![Detección de pinzas](Evidencias/ejecucion%20modelo%20pinzas.png)
+
+*Figura 8: Detección de pinzas en tiempo real con bounding box y confianza*
+
+El resultado es una aplicación interactiva que permite visualizar en tiempo real cómo el modelo identifica y localiza destornilladores y pinzas mediante la cámara, demostrando de manera práctica la efectividad del modelo entrenado en condiciones reales de operación.
 
 ## Conclusión
 
-Este proyecto demuestra exitosamente la implementación de un sistema de detección de objetos en tiempo real utilizando YOLOv8n. A través de un proceso metodológico que incluyó:
+Este proyecto demuestra exitosamente la implementación de un sistema de detección de objetos en tiempo real mediante arquitectura YOLO, validando la efectividad del enfoque seleccionado para tareas de visión artificial especializadas. A través de un proceso metodológico riguroso que incluyó:
 
-- Construcción cuidadosa del dataset con 200 imágenes anotadas
-- División estratégica del dataset en proporción 65-20-15
-- Entrenamiento eficiente con parámetros ajustados a las limitaciones de hardware disponible
-- Evaluación rigurosa del modelo mediante métricas estándar
+- **Construcción del dataset**: Compilación de 200 imágenes anotadas con precisión en Roboflow
+- **División estratégica**: Segmentación en proporción 65-20-15 para entrenamiento, validación y prueba
+- **Entrenamiento optimizado**: Selección de parámetros ajustados a las capacidades de hardware disponible
+- **Evaluación rigurosa**: Análisis completo mediante métricas estándar de la industria
 
-Se logró entrenar un modelo con desempeño excelente, capaz de detectar destornilladores y pinzas con precision de 0.987 y recall de 0.964. Estos resultados validan que el enfoque seleccionado es apropiado para tareas de detección de objetos específicos.
+Se logró entrenar un modelo con desempeño excelente, alcanzando precisión de 0.987 y recall de 0.964 a nivel general, demostrando la viabilidad técnica del sistema. Los resultados por clase revelan capacidades excepcionales: el modelo detecta el 100% de los destornilladores presentes y el 92.9% de las pinzas, ambos con precisión superior a 0.98.
 
-La implementación del archivo `yolo.py` demuestra la aplicabilidad práctica del modelo, permitiendo detección en tiempo real a través de la cámara. Este proyecto establece una base sólida para futuras mejoras, como:
+La implementación del archivo `yolo.py` demuestra la aplicabilidad práctica del modelo, permitiendo procesamiento en tiempo real a través de captura de cámara con visualización inmediata de resultados mediante bounding boxes. Este enfoque establece una base sólida y replicable para futuras expansiones:
 
-- Expansión del modelo para detectar clases adicionales de herramientas
-- Optimización para dispositivos con recursos computacionales limitados
-- Integración con sistemas de automatización industrial
-- Implementación en múltiples dispositivos para monitoreo distribuido
+- Extensión del modelo para detectar clases adicionales de herramientas y componentes
+- Optimización de arquitectura para dispositivos con recursos computacionales más limitados
+- Integración en sistemas de automatización industrial y control de calidad
+- Despliegue en múltiples dispositivos para monitoreo distribuido en tiempo real
 
-La combinación de arquitectura YOLO, datos de calidad y parámetros de entrenamiento bien justificados demuestra que es posible desarrollar sistemas de visión artificial efectivos y prácticos para aplicaciones especializadas.
+La combinación de arquitectura YOLO, preparación cuidadosa de datos y justificación fundamentada de parámetros de entrenamiento demuestra que es posible desarrollar sistemas de visión artificial altamente efectivos y prácticos para aplicaciones especializadas de industria.
